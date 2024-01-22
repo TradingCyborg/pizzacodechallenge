@@ -1,45 +1,28 @@
+#!/usr/bin/env python3
 
-from datetime import timedelta
-from models import db, User, Question, Answer, Vote
-from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, make_response, jsonify, request
 from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_restful import Api
 
-from views import *
-from flask_jwt_extended import JWTManager
+from models import db, Restaurant, RestaurantPizza, Pizza
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mo_qq1i_user:MzAwMJpfOzoTpJJNGOOMyTbTS7TBbq1J@dpg-cmlun1i1hbls73ccgjo0-a.oregon-postgres.render.com/mo_qq1i"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.json.compact = False
 
-CORS(app)
-
-db.init_app(app)
 migrate = Migrate(app, db)
 
-jwt = JWTManager()
-app.config["JWT_SECRET_KEY"] = "fjhjdjhfiskyfvdgvydklvsrfl"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
-jwt.init_app(app)
+db.init_app(app)
 
-app.register_blueprint(user_bp)
-app.register_blueprint(question_bp)
-app.register_blueprint(answer_bp)
-app.register_blueprint(vote_bp)
-app.register_blueprint(auth_bp)
+@app.route('/')
+def index():
+    return '<h1>Code challenge</h1>'
 
-# Operations CRUD
+@app.route('/restaurants')
+def restaurants():
 
-# JWT LOADER
-@jwt.token_in_blocklist_loader
-def token_in_blocklist_callback(jwt_header, jwt_data):
-    jti = jwt_data['jti']
-    token = TokenBlocklist.query.filter_by(jti=jti).first()
-    if token:
-        return token 
-    else:
-        return None
-
+    pass
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5555, debug=True)
